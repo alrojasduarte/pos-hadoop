@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 
-import co.edu.unal.pos.common.DBConstants;
+import co.edu.unal.pos.common.constants.DBConstants;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
