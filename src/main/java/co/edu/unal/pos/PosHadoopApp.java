@@ -1,49 +1,32 @@
 package co.edu.unal.pos;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.hadoop.store.DataStoreWriter;
-import org.springframework.data.hadoop.store.dataset.DatasetOperations;
+import java.sql.Connection;
 
-import co.edu.unal.pos.model.FactSales;
+import javax.swing.JFrame;
 
-/**
- * Hello world!
- *
- */
-@ComponentScan
-@EnableAutoConfiguration
-public class PosHadoopApp implements CommandLineRunner {	
-    
-    public DatasetOperations datasetOperations;
+import org.apache.log4j.Logger;
 
-	public DataStoreWriter<FactSales> writer;
+import co.edu.unal.pos.db.DBCommons;
 
-	private long count;
-	
-    public static void main(String[] args) {
-    	System.out.println( "Hello World!" );
-    	SpringApplication.run(PosHadoopApp.class, args);
-    	System.out.println( "Bye World!" );
-    }
+public class PosHadoopApp {
 
-	@Override
-	public void run(String... args) throws Exception {
+	private final static Logger logger = Logger.getLogger(PosHadoopApp.class);
+
+	public static void main(String[] args) {
+		JFrame jFrame = new JFrame();
+		jFrame.show();
+		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-			
+		logger.info("Testing connection");
+		Connection connection = null;
+		try{
+			connection = DBCommons.getInstance().getConnection();
+			logger.info("Testing connection success");
+		}catch(Exception e){
+			logger.error("The connection tested failed",e);
+		}finally{
+			DBCommons.getInstance().close(connection);
+		}
+		
 	}
-
-    @Autowired
-    public void setDatasetOperations(DatasetOperations datasetOperations) {
-        this.datasetOperations = datasetOperations;
-    }
-
-    @Autowired
-    public void setDataStoreWriter(DataStoreWriter dataStoreWriter) {
-        this.writer = dataStoreWriter;
-    }
-
 }
