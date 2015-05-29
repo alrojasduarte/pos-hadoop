@@ -4,6 +4,8 @@
 package co.edu.unal.pos.db;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
@@ -29,7 +31,16 @@ public class DBCommons {
 	}
 	
 	public Connection getConnection() throws SQLException{
-		return cpds.getConnection();
+		try{
+			logger.info("getting connection to pos relational model");
+			Connection connection = cpds.getConnection();
+			logger.info("successfull connection to pos relational model");
+			return connection;
+		}catch(SQLException e){
+			logger.info("error while trying to connecto to pos relational model");
+			throw e;
+		}
+		
 	}
 
 	private static void buildConnectionPool() {
@@ -61,6 +72,28 @@ public class DBCommons {
 				logger.warn("error while closing the given connection");
 			}
 		}
+	}
+
+	public void close(PreparedStatement preparedStatement) {
+		if(preparedStatement!=null){
+			try {
+				preparedStatement.close();
+			} catch (SQLException e) {
+				logger.warn("error while closing the given prepared statement");
+			}
+		}
+		
+	}
+	
+	public void close(ResultSet resultSet) {
+		if(resultSet!=null){
+			try {
+				resultSet.close();
+			} catch (SQLException e) {
+				logger.warn("error while closing the given result set");
+			}
+		}
+		
 	}
 
 }
