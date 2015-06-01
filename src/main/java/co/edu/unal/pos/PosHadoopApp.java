@@ -1,26 +1,52 @@
 package co.edu.unal.pos;
 
+import java.beans.PropertyVetoException;
+import java.sql.SQLException;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 
-import co.edu.unal.pos.db.BillDetailDAO;
-
+import co.edu.unal.pos.common.properties.PropertiesProvider;
+import co.edu.unal.pos.gui.PosHadoopJFrame;
 
 public class PosHadoopApp {
 
 	private final static Logger logger = Logger.getLogger(PosHadoopApp.class);
 
-	public static void main(String[] args) {
-		BillDetailDAO billDetail  = new BillDetailDAO();
-		int billDetailsCount = billDetail.countBillDetails();
-		int batchSize = 5000;
-		int batchEnd = billDetailsCount<batchSize?billDetailsCount:batchSize;
-		for(int batchStart = 1;batchStart<=billDetailsCount;batchStart+=batchSize){
-			batchEnd = batchStart+batchSize-1;
-			if(batchEnd>billDetailsCount){
-				batchEnd = billDetailsCount;
-			}
-			System.out.println(batchStart+"-"+(batchEnd));
-			
-		}
+	public static void main(String[] args) throws SQLException, PropertyVetoException {
+		
+		  /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(PosHadoopJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(PosHadoopJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(PosHadoopJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(PosHadoopJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+              PosHadoopJFrame posHadoopJFrame =  new PosHadoopJFrame();
+              posHadoopJFrame.setVisible(true);
+              posHadoopJFrame.updatePropertiesTableDataModel();
+            }
+        });
+
+		
 	}
 }

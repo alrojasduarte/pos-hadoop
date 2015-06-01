@@ -3,14 +3,22 @@
  */
 package co.edu.unal.pos.db;
 
+import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 
+import co.edu.unal.pos.common.constants.DBConnection;
 import co.edu.unal.pos.common.constants.DBConstants;
+import co.edu.unal.pos.common.constants.DBPropertiesKeys;
+import co.edu.unal.pos.common.properties.PropertiesProvider;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -24,17 +32,19 @@ public class DBCommons {
 	
 	private static DBCommons INSTANCE = null;
 
-	private static final ComboPooledDataSource cpds = new ComboPooledDataSource();
+	private static Map<DBConnection,ComboPooledDataSource> connectionPoolsByConnection = null;
 
-	static {
-		buildConnectionPool();
+	private static Map<DBConnection,String[]> connectionDataByConnection = null;
+	
+	public DBCommons(){
+		buildConnectionPools();
 	}
 	
-	public Connection getConnection() throws SQLException{
+	public Connection getConnection(DBConnection dbConnection) throws SQLException, PropertyVetoException{
 		try{
-			logger.info("getting connection to pos relational model");
-			Connection connection = cpds.getConnection();
-			logger.info("successfull connection to pos relational model");
+			logger.info("getting connection to "+dbConnection);
+			Connection connection = connectionPoolsByConnection.get(dbConnection).getConnection();
+			logger.info("successfull connection to "+dbConnection);
 			return connection;
 		}catch(SQLException e){
 			logger.info("error while trying to connecto to pos relational model");
@@ -43,26 +53,33 @@ public class DBCommons {
 		
 	}
 
-	private static void buildConnectionPool() {
-		try {
-			cpds.setDriverClass(DBConstants.DRIVER_CLASS);
-			cpds.setJdbcUrl(DBConstants.JDBC_URL);
-			cpds.setUser(DBConstants.USER);
-			cpds.setPassword(DBConstants.USER_PASSWORD);
-			cpds.setMinPoolSize(5);
-			cpds.setAcquireIncrement(5);
-			cpds.setMaxPoolSize(20);
-		} catch (Exception e) {
-			logger.error("An error ocurred while building the connection pool to pos relational model",e);
-		} 
+	
+	private void buildConnectionPools() {
+		try{
+			if(connectionDataByConnection==null){
+				logger.info("building connection pools");
+				connectionDataByConnection = new HashMap<DBConnection, String[]>();
+				connectionDataByConnection.put(DBConnection.POS_RM, new String[]{DBConstants.POS_RM_JDBC_URL,DBConstants.POS_RM_USER, DBConstants.POS_RM_USER_PASSWORD});
+				connectionDataByConnection.put(DBConnection.POS_HADOOP, new String[]{DBConstants.POS_HADOOP_JDBC_URL,DBConstants.POS_HADOOP_USER, DBConstants.POS_HADOOP_USER_PASSWORD});
+				connectionPoolsByConnection = new HashMap<DBConnection, ComboPooledDataSource>();
+				for(Map.Entry<DBConnection, String[]> connectionDataEntry:connectionDataByConnection.entrySet()){
+					ComboPooledDataSource  comboPooledDataSource = new ComboPooledDataSource();
+					comboPooledDataSource.setDriverClass(DBConstants.DRIVER_CLASS);
+					comboPooledDataSource.setJdbcUrl(connectionDataEntry.getValue()[0]);
+					comboPooledDataSource.setUser(connectionDataEntry.getValue()[1]);
+					comboPooledDataSource.setPassword(connectionDataEntry.getValue()[2]);
+					comboPooledDataSource.setMinPoolSize(5);
+					comboPooledDataSource.setAcquireIncrement(5);
+					comboPooledDataSource.setMaxPoolSize(20);
+					connectionPoolsByConnection.put(connectionDataEntry.getKey(), comboPooledDataSource);
+					logger.info("build connection pool for "+connectionDataEntry.getKey());
+				}				
+			}
+		}catch(Exception e){
+			logger.error("erro while trying to build database connection pools",e);
+		}
 	}
 
-	public static DBCommons getInstance() {
-		if (INSTANCE == null) {
-			INSTANCE = new DBCommons();
-		}
-		return INSTANCE;
-	}
 
 	public void close(Connection connection) {
 		if(connection!=null){
