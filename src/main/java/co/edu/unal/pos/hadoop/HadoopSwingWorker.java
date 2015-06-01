@@ -3,6 +3,8 @@ package co.edu.unal.pos.hadoop;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -43,55 +45,40 @@ public class HadoopSwingWorker extends SwingWorker<Void, Void> {
 		posHadoopJFrame.getEtlJProgressBar().setString("The total sales facts to process is "+totalSalesFactsToProcess);
 		int numberOfWorkers = PropertiesProvider.getInstance().getPropertyAsInt(HadoopPropertiesKeys.NUBER_OF_WORKERS, HadoopConstants.NUMBER_OF_WORKERS);
 		List<HadoopWorker> hadoopWorkers = new ArrayList<HadoopWorker>(numberOfWorkers);
-		logger.info("The work will be do by "+numberOfWorkers+" workers");
-		
-		for (int i = 1; i <= numberOfWorkers; i++) {
-			hadoopWorkers.add(new HadoopWorker());
-		}
-
+		logger.info("The work will be do by "+numberOfWorkers+" workers");		
 		ExecutorService executor = Executors.newFixedThreadPool(PropertiesProvider.getInstance().getPropertyAsInt(HadoopPropertiesKeys.NUBER_OF_WORKERS,HadoopConstants.NUMBER_OF_WORKERS));
+		CompletionService<HadoopWorkerResult> completionService = new ExecutorCompletionService<HadoopWorkerResult>(executor);
 		int from = 0;
 		int batchSize = PropertiesProvider.getInstance().getPropertyAsInt(HadoopPropertiesKeys.BATCH_SIZE,HadoopConstants.BATCH_SIZE);
 		int to = batchSize;
 		int totalSalesFactsProcessedCount = 0;
 		posHadoopJFrame.getEtlJProgressBar().setIndeterminate(false);
 		Double progressPercentaje = 0D;
-		while(to<totalSalesFactsToProcess){
-			logger.info("from="+from+",to="+to);
-			try {
-				int i = 0;
-				for(HadoopWorker hadoopWorker:hadoopWorkers){
-					logger.info("from="+from+",to="+to);
-					hadoopWorker.setFrom(from);
-					hadoopWorker.setTo(to);					
-				    from += batchSize;
-				    to+=batchSize;
-				    i++;
-				    if(to>totalSalesFactsToProcess){
-				    	hadoopWorker.setTo(totalSalesFactsToProcess);
-				    	int j = hadoopWorkers.size()-1;
-				    	while(j>=i){
-				    		hadoopWorkers.remove(j);
-				    		j--;
-				    	}
-				    	break;
-				    }
-				}
-				List<Future<HadoopWorkerResult>> results = executor.invokeAll(hadoopWorkers);
-				Iterator<Future<HadoopWorkerResult>> resultsIterator = results.iterator();
-				while(resultsIterator.hasNext()){
-					Future<HadoopWorkerResult> result = resultsIterator.next();
-					totalSalesFactsProcessedCount+=result.get().getSalesFactsProcessedCount();
-				}
-				logger.info("the total sales facts processed count is "+totalSalesFactsProcessedCount);
-				progressPercentaje = ((double)totalSalesFactsProcessedCount)/((double)totalSalesFactsToProcess);
-				progressPercentaje *= 100;
-				logger.info("progress percentaje="+(progressPercentaje.intValue()*100));
-				posHadoopJFrame.getEtlJProgressBar().setValue(progressPercentaje.intValue());
-				posHadoopJFrame.getEtlJProgressBar().setString(progressPercentaje.intValue()+" % sales facts processed ");
-			} catch (Exception e) {
-				logger.error("error while invoking hadoop workers", e);
-			}	
+		int numberOfRequestedThreads = 0;
+		while(to<=totalSalesFactsToProcess){
+			logger.info("from="+from+",to="+to);			
+			completionService.submit(new HadoopWorker(from, to));			
+			from+=batchSize;
+			to+=batchSize;
+			numberOfRequestedThreads++;
+			if(to>totalSalesFactsToProcess){
+				to = totalSalesFactsToProcess;
+				completionService.submit(new HadoopWorker(from, to));	
+				break;
+			}			
+		}
+		logger.info("done making workers "+numberOfRequestedThreads);
+		while(numberOfRequestedThreads-->0){
+			logger.info("numberOfRequestedThreads="+numberOfRequestedThreads);
+			Future<HadoopWorkerResult> future = completionService.take();
+			logger.info("taked!!");
+			HadoopWorkerResult hadoopWorkerResult = future.get();
+			totalSalesFactsProcessedCount+=hadoopWorkerResult.getSalesFactsProcessedCount();
+			progressPercentaje = ((double)totalSalesFactsProcessedCount)/((double)totalSalesFactsToProcess);
+			progressPercentaje *= 100;
+			logger.info("progressPercentaje="+progressPercentaje);
+			posHadoopJFrame.getEtlJProgressBar().setValue(progressPercentaje.intValue());
+			posHadoopJFrame.getEtlJProgressBar().setString(progressPercentaje.intValue()+" % sales facts processed ");
 		}
 		posHadoopJFrame.getEtlJProgressBar().setValue(100);
 		posHadoopJFrame.getEtlJProgressBar().setString("100 % sales facts processed ");
