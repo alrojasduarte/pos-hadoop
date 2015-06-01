@@ -1,7 +1,6 @@
 package co.edu.unal.pos.hadoop;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
@@ -41,6 +40,7 @@ public class HadoopSwingWorker extends SwingWorker<Void, Void> {
 		
 		SalesFactsDAO salesFactsDAO = new SalesFactsDAO();
 		int totalSalesFactsToProcess = salesFactsDAO.countSalesFacts();
+//		int totalSalesFactsToProcess = 50000;
 		logger.info("the total sales facts to process is "+totalSalesFactsToProcess);
 		posHadoopJFrame.getEtlJProgressBar().setString("The total sales facts to process is "+totalSalesFactsToProcess);
 		int numberOfWorkers = PropertiesProvider.getInstance().getPropertyAsInt(HadoopPropertiesKeys.NUBER_OF_WORKERS, HadoopConstants.NUMBER_OF_WORKERS);
@@ -55,6 +55,7 @@ public class HadoopSwingWorker extends SwingWorker<Void, Void> {
 		posHadoopJFrame.getEtlJProgressBar().setIndeterminate(false);
 		Double progressPercentaje = 0D;
 		int numberOfRequestedThreads = 0;
+		HadoopClient.getInstance().openPath();
 		while(to<=totalSalesFactsToProcess){
 			logger.info("from="+from+",to="+to);			
 			completionService.submit(new HadoopWorker(from, to));			
@@ -80,6 +81,7 @@ public class HadoopSwingWorker extends SwingWorker<Void, Void> {
 			posHadoopJFrame.getEtlJProgressBar().setValue(progressPercentaje.intValue());
 			posHadoopJFrame.getEtlJProgressBar().setString(progressPercentaje.intValue()+" % sales facts processed ");
 		}
+		HadoopClient.getInstance().closePath();
 		posHadoopJFrame.getEtlJProgressBar().setValue(100);
 		posHadoopJFrame.getEtlJProgressBar().setString("100 % sales facts processed ");
 		logger.info("finished etl stage with "+totalSalesFactsProcessedCount+" sales facts processed ");

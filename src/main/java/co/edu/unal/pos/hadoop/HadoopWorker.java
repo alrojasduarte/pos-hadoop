@@ -1,5 +1,6 @@
 package co.edu.unal.pos.hadoop;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -54,8 +55,8 @@ public class HadoopWorker implements Callable<HadoopWorkerResult> {
 		return hadoopWorkerResult;
 	}
 
-	private void writeSaleFact(SaleFact saleFact) {		
-		gson.toJson(saleFact);
+	private void writeSaleFact(SaleFact saleFact) throws IOException {		
+		HadoopClient.getInstance().write(gson.toJson(saleFact));
 	}
 
 	public int getFrom() {

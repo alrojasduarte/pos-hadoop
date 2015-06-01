@@ -1,6 +1,7 @@
 package co.edu.unal.pos;
 
 import java.beans.PropertyVetoException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -8,12 +9,13 @@ import org.apache.log4j.Logger;
 
 import co.edu.unal.pos.common.properties.PropertiesProvider;
 import co.edu.unal.pos.gui.PosHadoopJFrame;
+import co.edu.unal.pos.hadoop.HadoopClient;
 
 public class PosHadoopApp {
 
 	private final static Logger logger = Logger.getLogger(PosHadoopApp.class);
 
-	public static void main(String[] args) throws SQLException, PropertyVetoException {
+	public static void main(String[] args) throws SQLException, PropertyVetoException, IOException {
 		
 		  /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -45,8 +47,7 @@ public class PosHadoopApp {
               posHadoopJFrame.setVisible(true);
               posHadoopJFrame.updatePropertiesTableDataModel();
             }
-        });
-
+        });	
 		
 	}
 }
