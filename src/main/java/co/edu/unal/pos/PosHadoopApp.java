@@ -3,16 +3,14 @@ package co.edu.unal.pos;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import co.edu.unal.pos.common.properties.PropertiesProvider;
 import co.edu.unal.pos.gui.PosHadoopJFrame;
-import co.edu.unal.pos.hadoop.HadoopClient;
 
 public class PosHadoopApp {
 
+	@SuppressWarnings("unused")
 	private final static Logger logger = Logger.getLogger(PosHadoopApp.class);
 
 	public static void main(String[] args) throws SQLException, PropertyVetoException, IOException {
@@ -47,7 +45,8 @@ public class PosHadoopApp {
               posHadoopJFrame.setVisible(true);
               posHadoopJFrame.updatePropertiesTableDataModel();
             }
-        });	
+        });
+		
 		
 	}
 }

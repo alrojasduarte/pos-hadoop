@@ -5,33 +5,21 @@
  */
 package co.edu.unal.pos.gui;
 
-import java.text.NumberFormat;
-import java.util.Currency;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
-import org.apache.commons.lang.StringUtils;
-import org.springframework.format.number.CurrencyFormatter;
-
 import co.edu.unal.pos.common.constants.AggregationLevel;
-import co.edu.unal.pos.common.constants.IntegerFilterOperator;
 import co.edu.unal.pos.common.properties.PropertiesProvider;
 import co.edu.unal.pos.hadoop.JobRunner;
-import co.edu.unal.pos.hadoop.ReaderClient;
-import co.edu.unal.pos.model.SaleFact;
 import co.edu.unal.pos.model.SaleFactFilter;
 
 /**
  *
  * @author andres.rojas
  */
-public class PosHadoopJFrame extends javax.swing.JFrame {
+public class PosHadoopJFrameSwap extends javax.swing.JFrame {
 	
     /**
 	 * 
@@ -40,7 +28,7 @@ public class PosHadoopJFrame extends javax.swing.JFrame {
 	
 	private static final String[] CONFIGURATION_COLUMN_NAMES = {"Property", "Value"};
 
-	private static final String[] MAP_REDUCE_RESULTS_COLUMNS_NAMES = {"Year","Month","Day","Quantity","Price","Product Id", "Product Description"};
+	private static final String[] MAP_REDUCE_RESULTS_COLUMNS_NAMES = {"Year","Month","Day","Product Id", "Product Description", "Quantity"};
 	
 	private static final String[] OPERATORS = {"=","<",">","<=",">="};
 	
@@ -59,22 +47,19 @@ public class PosHadoopJFrame extends javax.swing.JFrame {
 
 	private javax.swing.table.DefaultTableModel mapReduceResultsTableDataModel = new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                    {null,null, null, null, null, null, null},
-                    {null,null, null, null, null, null, null},
-                    {null,null, null, null, null, null, null},
-                    {null,null, null, null, null, null, null},
+                    {null, null, null, null, null, null},
+                    {null, null, null, null, null, null},
+                    {null, null, null, null, null, null},
+                    {null, null, null, null, null, null}
                 },
                 MAP_REDUCE_RESULTS_COLUMNS_NAMES);
 
-	private NumberFormat currencyFormatter = null;
     /**
      * Creates new form PosHadoopJFrame
      */
-    public PosHadoopJFrame() {
+    public PosHadoopJFrameSwap() {
         initComponents();
         this.setTitle("POS Hadoop");
-        currencyFormatter=  
-            NumberFormat.getCurrencyInstance();
     }
 
     /**
@@ -389,29 +374,9 @@ public class PosHadoopJFrame extends javax.swing.JFrame {
     		@Override
     		protected Void doInBackground() throws Exception {
     			disableGUI();
-    			String id = StringUtils.trimToNull(productIdJTextField.getText());
-    			String description = StringUtils.trimToNull(productDescriptionJTextField.getText());
-    			Integer year = getIntegerValue(yearJTextField);
-    			IntegerFilterOperator yearOperator = getIntegerFilterOperator(yearOperatorJComboBox);
-    			Integer month = getIntegerValue(monthJTextField);
-    			IntegerFilterOperator monthOperator = getIntegerFilterOperator(monthOperatorJComboBox);
-    			Integer day = getIntegerValue(dayJTextField);
-    			IntegerFilterOperator dayOperator = getIntegerFilterOperator(dayOperatorJComboBox);
-    			SaleFactFilter saleFactFilter = new SaleFactFilter(id, description, year, yearOperator, month, monthOperator, day, dayOperator);
-    			JobRunner.getInstance().runJob(getAggregationLevel(),saleFactFilter);
-    			List<SaleFact> saleFacts = ReaderClient.getInstance().getSaleFacts();
-    			String [][] mapReduceResults = new String[saleFacts.size()][MAP_REDUCE_RESULTS_COLUMNS_NAMES.length];
-    			for(int i = 0;i<saleFacts.size();i++){
-    				SaleFact saleFact = saleFacts.get(i);
-    				mapReduceResults[i][0] = saleFact.getTimeDimension().getYear()!=null?String.valueOf(saleFact.getTimeDimension().getYear()):"";
-    				mapReduceResults[i][1] = saleFact.getTimeDimension().getMonth()!=null?String.valueOf(saleFact.getTimeDimension().getMonth()):"";
-    				mapReduceResults[i][2] = saleFact.getTimeDimension().getDay()!=null?String.valueOf(saleFact.getTimeDimension().getDay()):"";
-    				mapReduceResults[i][3] = String.valueOf(saleFact.getProductQuantity());
-    				mapReduceResults[i][4] = currencyFormatter.format(saleFact.getPrice());
-    				mapReduceResults[i][5] = saleFact.getProductDimension().getId();
-    				mapReduceResults[i][6] = saleFact.getProductDimension().getDescription();
-    			}
-    			mapReduceResultsTableDataModel.setDataVector(mapReduceResults, MAP_REDUCE_RESULTS_COLUMNS_NAMES);
+//    			SaleFactFilter saleFactFilter = new SaleFactFilter(id, description, year, yearOperator, month, monthOperator, day, dayOperator);
+    			SaleFactFilter saleFactFilter = null;
+//    			JobRunner.getInstance().runJob(saleFactFilter);
     			enableGUI();
     			return null;
     		}
@@ -421,8 +386,8 @@ public class PosHadoopJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_startMapReduceJButtonActionPerformed
 
     private void startEtlJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startEtlJButtonActionPerformed
-    	SwingWorker<Void,Void> swingWorker = new co.edu.unal.pos.hadoop.SwingWorker(this);
-    	swingWorker.execute();
+//    	SwingWorker<Void,Void> swingWorker = new co.edu.unal.pos.hadoop.SwingWorker(this);
+//    	swingWorker.execute();
     }//GEN-LAST:event_startEtlJButtonActionPerformed
 
     private void saveConfigurationJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_configurationJButtonActionPerformed
@@ -482,19 +447,7 @@ public class PosHadoopJFrame extends javax.swing.JFrame {
 		this.startEtlJButton.setEnabled(true);
 		this.saveConfigurationJButton.setEnabled(true);
 		this.configurationJTable.setEnabled(true);
-		this.mapReduceResultsJPanel.setEnabled(true);
-		this.aggregationLevelJComboBox.setEnabled(true);
-		this.filtersJPanel.setEnabled(true);
-		this.yearJTextField.setEnabled(true);
-		this.monthJTextField.setEnabled(true);
-		this.dayJTextField.setEnabled(true);
-		this.yearOperatorJComboBox.setEnabled(true);
-		this.monthOperatorJComboBox.setEnabled(true);
-		this.dayOperatorJComboBox.setEnabled(true);
-		this.mapReduceResultsJTable.setEnabled(true);
-		this.productIdJTextField.setEnabled(true);
-		this.productDescriptionJTextField.setEnabled(true);
-		this.startMapReduceJButton.setEnabled(true);
+		
 	}
 	
 	public void disableGUI() {
@@ -502,24 +455,11 @@ public class PosHadoopJFrame extends javax.swing.JFrame {
 		this.startEtlJButton.setEnabled(false);
 		this.saveConfigurationJButton.setEnabled(false);
 		this.configurationJTable.setEnabled(false);
-		this.mapReduceResultsJPanel.setEnabled(false);
-		this.aggregationLevelJComboBox.setEnabled(false);
-		this.filtersJPanel.setEnabled(false);
-		this.yearJTextField.setEnabled(false);
-		this.monthJTextField.setEnabled(false);
-		this.dayJTextField.setEnabled(false);
-		this.yearOperatorJComboBox.setEnabled(false);
-		this.monthOperatorJComboBox.setEnabled(false);
-		this.dayOperatorJComboBox.setEnabled(false);
-		this.mapReduceResultsJTable.setEnabled(false);
-		this.productIdJTextField.setEnabled(false);
-		this.startMapReduceJButton.setEnabled(false);
-		this.productDescriptionJTextField.setEnabled(false);
 	}
 	
 	public AggregationLevel getAggregationLevel(){
 		String aggregationLevel = aggregationLevelJComboBox.getSelectedItem().toString();
-		return AggregationLevel.valueOf(aggregationLevel.toUpperCase());
+		return AggregationLevel.valueOf(aggregationLevel);
 	}
 	
 	
@@ -529,25 +469,7 @@ public class PosHadoopJFrame extends javax.swing.JFrame {
 	}
 
     
-    private Integer getIntegerValue(JTextField jTextField) {
-		String stringValue = StringUtils.trimToNull(jTextField.getText());
-		Integer integerValue = null; 
-		if(stringValue!=null){
-			integerValue = Integer.valueOf(stringValue);
-		}
-		return integerValue;
-	}
-    
-
-	private IntegerFilterOperator getIntegerFilterOperator(
-			JComboBox jComboBox) {
-		String selectedOperator = (String)jComboBox.getSelectedItem();
-		
-		return IntegerFilterOperator.getFromString(selectedOperator);
-	}
-
-
-	/**
+    /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {

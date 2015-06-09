@@ -12,9 +12,9 @@ import co.edu.unal.pos.common.constants.HadoopWorkResult;
 import co.edu.unal.pos.db.SalesFactsDAO;
 import co.edu.unal.pos.model.SaleFact;
 //http://noushinb.blogspot.com/2013/04/reading-writing-hadoop-sequence-files.html
-public class HadoopWorker implements Callable<HadoopWorkerResult> {
+public class Worker implements Callable<WorkerResult> {
 	
-	private final static Logger logger = Logger.getLogger(HadoopWorker.class);
+	private final static Logger logger = Logger.getLogger(Worker.class);
 
 
 	private int from;
@@ -22,20 +22,20 @@ public class HadoopWorker implements Callable<HadoopWorkerResult> {
 
 
 	private SalesFactsDAO salesFactsDAO = new SalesFactsDAO();
-	private HadoopWorkerResult hadoopWorkerResult = new HadoopWorkerResult();
+	private WorkerResult hadoopWorkerResult = new WorkerResult();
 	private Gson gson = new Gson();
 
-	public HadoopWorker(int from, int to){
+	public Worker(int from, int to){
 		this.from = from;
 		this.to = to;
 	
 	}
 	
-	public HadoopWorker() {
+	public Worker() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public HadoopWorkerResult call() throws Exception {
+	public WorkerResult call() throws Exception {
 		logger.info("procesing sales facts from "+from+" to "+to);
 		try{
 
@@ -56,7 +56,7 @@ public class HadoopWorker implements Callable<HadoopWorkerResult> {
 	}
 
 	private void writeSaleFact(SaleFact saleFact) throws IOException {		
-		HadoopClient.getInstance().write(gson.toJson(saleFact));
+		WriterClient.getInstance().write(gson.toJson(saleFact));
 	}
 
 	public int getFrom() {

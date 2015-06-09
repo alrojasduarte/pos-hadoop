@@ -10,15 +10,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 
 import co.edu.unal.pos.common.constants.DBConnection;
 import co.edu.unal.pos.common.constants.DBConstants;
-import co.edu.unal.pos.common.constants.DBPropertiesKeys;
-import co.edu.unal.pos.common.properties.PropertiesProvider;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -30,8 +26,6 @@ public class DBCommons {
 
 	private final static Logger logger = Logger.getLogger(DBCommons.class);
 	
-	private static DBCommons INSTANCE = null;
-
 	private static Map<DBConnection,ComboPooledDataSource> connectionPoolsByConnection = null;
 
 	private static Map<DBConnection,String[]> connectionDataByConnection = null;

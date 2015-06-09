@@ -13,29 +13,28 @@ import co.edu.unal.pos.common.constants.HadoopPropertiesKeys;
 import co.edu.unal.pos.common.properties.PropertiesProvider;
 
 
-public class HadoopClient {
+public class WriterClient {
 
-	private final static Logger logger = Logger.getLogger(HadoopClient.class);
+	private final static Logger logger = Logger.getLogger(WriterClient.class);
 	
-	private static HadoopClient INSTANCE;
+	private static WriterClient INSTANCE;
 	private Configuration configuration = new Configuration();
 	private String currentPath = null;
 	private TextFileWriter writer;
 	private int numberOfWrittenEntities = 0;
 	
-	private HadoopClient(){
-		 configuration.set(HadoopPropertiesKeys.FS_DEFAULT_FS, PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.DFS_URL, HadoopConstants.DFS_URL));
-	}
-	
 	public void openPath() throws IOException{
-		closePath();		
+		closePath();
+		configuration.set(HadoopPropertiesKeys.FS_DEFAULT_FS, PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.DFS_URL, HadoopConstants.DFS_URL));
 		currentPath = PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.PATH_PATTERN, HadoopConstants.PATH_PATTERN);
 		currentPath = currentPath.replaceAll(HadoopConstants.PATH_UUID_WILDCARD, UUID.randomUUID().toString());
-		String posHadopHome = PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.POS_HADOOP_HOME, HadoopConstants.POS_HADOOP_HOME);
-		Path path = new Path(posHadopHome+"/"+currentPath);
-		logger.info("openning "+path);
-		writer = new TextFileWriter(configuration, path, null);
-		logger.info("openned "+path);
+		String posHadopInput = PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.POS_HADOOP_INPUT, HadoopConstants.POS_HADOOP_INPUT);
+		Path inputPath = new Path(posHadopInput+"/"+currentPath);
+		logger.info("openning "+inputPath);
+//		FileSystem fs = FileSystem.get(configuration);
+//		fs.create(inputPath);
+		writer = new TextFileWriter(configuration, inputPath, null);
+		logger.info("openned "+inputPath);
 	}
 	
 	public void write(String entity) throws IOException{
@@ -55,7 +54,7 @@ public class HadoopClient {
 		if(writer!=null){
 			writer.close();
 			writer.flush();
-		}
+		}		
 	}
 	
 	
@@ -63,9 +62,9 @@ public class HadoopClient {
 		return currentPath;
 	}
 
-	public static HadoopClient getInstance(){
+	public static WriterClient getInstance(){
 		if(INSTANCE==null){
-			INSTANCE = new HadoopClient();
+			INSTANCE = new WriterClient();
 		}
 		return INSTANCE;
 	}

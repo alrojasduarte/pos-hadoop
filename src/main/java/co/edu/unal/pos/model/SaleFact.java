@@ -9,22 +9,23 @@ package co.edu.unal.pos.model;
  */
 public class SaleFact {
 
-	private long id;
+	private Long id;
 	private ProductDimension productDimension;
-	private int productQuantity;
-	private BillDimension billDimension;
+	private Integer productQuantity;
+	private Integer price;
+	private TimeDimension timeDimension;
 	
-	public SaleFact(ProductDimension productDimension,int productQuantity, BillDimension billDimension){
+	public SaleFact(ProductDimension productDimension,Integer productQuantity, TimeDimension timeDimension){
 		this.productDimension = productDimension;
 		this.productQuantity = productQuantity;
-		this.billDimension = billDimension;
+		this.timeDimension = timeDimension;
 	}
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -36,21 +37,31 @@ public class SaleFact {
 		this.productDimension = productDimension;
 	}
 
-	public int getProductQuantity() {
+	public Integer getProductQuantity() {
 		return productQuantity;
 	}
 
-	public void setProductQuantity(int productQuantity) {
+	public void setProductQuantity(Integer productQuantity) {
 		this.productQuantity = productQuantity;
 	}
 
-	public BillDimension getBillDimension() {
-		return billDimension;
+	public TimeDimension getTimeDimension() {
+		return timeDimension;
 	}
 
-	public void setBillDimension(BillDimension billDimension) {
-		this.billDimension = billDimension;
+	public void setTimeDimension(TimeDimension timeDimension) {
+		this.timeDimension = timeDimension;
 	}
+
+	public Integer getPrice() {
+		return price;
+	}
+
+	public void setPrice(Integer price) {
+		this.price = price;
+	}
+
 	
+		
 	
 }

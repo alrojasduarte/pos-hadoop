@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 
 import co.edu.unal.pos.common.constants.DBConnection;
 import co.edu.unal.pos.common.constants.SqlQueries;
-import co.edu.unal.pos.model.BillDimension;
+import co.edu.unal.pos.model.TimeDimension;
 import co.edu.unal.pos.model.ProductDimension;
 import co.edu.unal.pos.model.SaleFact;
 
@@ -66,8 +66,9 @@ public class SalesFactsDAO {
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				ProductDimension productDimension = new ProductDimension(resultSet.getString(1), resultSet.getString(2));
-				BillDimension  billDimension = new BillDimension(resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6));
+				TimeDimension  billDimension = new TimeDimension(resultSet.getInt(5), resultSet.getInt(6), resultSet.getInt(7));
 				SaleFact salesFact = new SaleFact(productDimension,resultSet.getInt(3),billDimension);
+				salesFact.setPrice(resultSet.getInt(4));
 				salesFacts.add(salesFact);
 				
 			}

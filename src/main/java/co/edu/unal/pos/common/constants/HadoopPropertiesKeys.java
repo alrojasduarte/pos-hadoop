@@ -13,7 +13,15 @@ public interface HadoopPropertiesKeys {
 	String FS_DEFAULT_FS = "fs.defaultFS";
 
 	String POS_HADOOP_HOME = NAME_SPACE+PropertiesKeys.NAME_SPACE+"posHadoopHome";
+	
+	String POS_HADOOP_INPUT = NAME_SPACE+PropertiesKeys.NAME_SPACE+"posHadoopInput";
+	
+	String POS_HADOOP_OUTPUT = NAME_SPACE+PropertiesKeys.NAME_SPACE+"posHadoopOutput";
 
 	String FILE_FLUSH_SIZE = NAME_SPACE+PropertiesKeys.NAME_SPACE+"fileFlushSize";
+
+	String AGGREGATION_LEVEL = NAME_SPACE+PropertiesKeys.NAME_SPACE+"aggregationLevel";
+
+	String SALE_FACT_FILTER = NAME_SPACE+PropertiesKeys.NAME_SPACE+"saleFactFilter";
 	
 }

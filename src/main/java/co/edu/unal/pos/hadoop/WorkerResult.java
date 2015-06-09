@@ -2,17 +2,17 @@ package co.edu.unal.pos.hadoop;
 
 import co.edu.unal.pos.common.constants.HadoopWorkResult;
 
-public class HadoopWorkerResult {
+public class WorkerResult {
 
 	private HadoopWorkResult hadoopWorkResult;
 	private int salesFactsProcessedCount;
 
-	public HadoopWorkerResult(HadoopWorkResult hadoopWorkResult, int salesFactsProcessedCount) {
+	public WorkerResult(HadoopWorkResult hadoopWorkResult, int salesFactsProcessedCount) {
 		this.hadoopWorkResult = hadoopWorkResult;
 		this.salesFactsProcessedCount = salesFactsProcessedCount;
 	}
 
-	public HadoopWorkerResult() {
+	public WorkerResult() {
 		// TODO Auto-generated constructor stub
 	}
 
