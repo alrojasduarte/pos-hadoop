@@ -102,6 +102,10 @@ public class PropertiesProvider {
 	public int getPropertyAsInt(String key, int defaultValue) {
 		return Integer.parseInt(getProperty(key, String.valueOf(defaultValue)));
 	}
+	
+	public boolean getPropertyAsBoolean(String key, boolean defaultValue) {
+		return Boolean.parseBoolean(getProperty(key, String.valueOf(defaultValue)));
+	}
 
 	public void saveProperties(Map<String, String> properties) {
 		Connection connection = null;

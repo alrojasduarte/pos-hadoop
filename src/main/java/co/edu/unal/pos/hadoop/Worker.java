@@ -56,7 +56,8 @@ public class Worker implements Callable<WorkerResult> {
 	}
 
 	private void writeSaleFact(SaleFact saleFact) throws IOException {		
-		WriterClient.getInstance().write(gson.toJson(saleFact));
+//		WriterClient.getInstance().write(gson.toJson(saleFact));
+		logger.info(gson.toJson(saleFact));
 	}
 
 	public int getFrom() {

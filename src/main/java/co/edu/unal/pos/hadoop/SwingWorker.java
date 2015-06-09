@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import co.edu.unal.pos.common.constants.DBConnection;
 import co.edu.unal.pos.common.constants.HadoopConstants;
 import co.edu.unal.pos.common.constants.HadoopPropertiesKeys;
+import co.edu.unal.pos.common.constants.PropertiesKeys;
 import co.edu.unal.pos.common.properties.PropertiesProvider;
 import co.edu.unal.pos.db.DBCommons;
 import co.edu.unal.pos.db.SalesFactsDAO;
@@ -35,8 +36,13 @@ public class SwingWorker extends javax.swing.SwingWorker<Void, Void> {
 		dbCommons.getConnection(DBConnection.POS_HADOOP);
 		
 		SalesFactsDAO salesFactsDAO = new SalesFactsDAO();
-//		int totalSalesFactsToProcess = salesFactsDAO.countSalesFacts();
+		boolean testMode = PropertiesProvider.getInstance().getPropertyAsBoolean(PropertiesKeys.TEST_MODE, false);
 		int totalSalesFactsToProcess = 5000;
+		if(!testMode){
+			totalSalesFactsToProcess = salesFactsDAO.countSalesFacts();			
+		}
+		
+		
 		logger.info("the total sales facts to process is "+totalSalesFactsToProcess);
 		posHadoopJFrame.getEtlJProgressBar().setString("The total sales facts to process is "+totalSalesFactsToProcess);
 		int numberOfWorkers = PropertiesProvider.getInstance().getPropertyAsInt(HadoopPropertiesKeys.NUBER_OF_WORKERS, HadoopConstants.NUMBER_OF_WORKERS);
