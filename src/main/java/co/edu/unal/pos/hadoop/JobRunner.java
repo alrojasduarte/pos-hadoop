@@ -40,41 +40,46 @@ public class JobRunner {
 	public void runJob(AggregationLevel aggregationLevel,SaleFactFilter saleFactFilter) throws IOException{
 	
 		logger.info("executing job");
-		JobConf jobConf = new JobConf(JobRunner.class);
-	     jobConf.setJobName(HadoopConstants.POS_HADOOP_JOB_NAME);
-	     logger.info("the filter is "+gson.toJson(saleFactFilter));
-	     jobConf.set(HadoopPropertiesKeys.FS_DEFAULT_FS, PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.DFS_URL, HadoopConstants.DFS_URL));
-	     if(saleFactFilter!=null){
-	    	 jobConf.set(HadoopPropertiesKeys.SALE_FACT_FILTER,gson.toJson(saleFactFilter));
-	     }
-	     jobConf.setEnum(HadoopPropertiesKeys.AGGREGATION_LEVEL, aggregationLevel);
-	     jobConf.setOutputKeyClass(Text.class);
-	     jobConf.setOutputValueClass(Text.class);
-	
-	     jobConf.setMapperClass(Map.class);
-	     jobConf.setCombinerClass(Reduce.class);
-	     jobConf.setReducerClass(Reduce.class);
-	
-	     jobConf.setInputFormat(TextInputFormat.class);
-	     jobConf.setOutputFormat(TextOutputFormat.class);
-	
-	     FileSystem fs = FileSystem.get(jobConf);
-	     
-	     String posHadoopInput = PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.POS_HADOOP_INPUT, HadoopConstants.POS_HADOOP_INPUT);
-	     Path posHadoopInputPath=  new Path(posHadoopInput+"/"+inputPath);
-	     logger.info("the inputpath is "+posHadoopInputPath);
-	     
-	     
-	    Path posHadoopOutputPath =  new Path(PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.POS_HADOOP_OUTPUT, HadoopConstants.POS_HADOOP_OUTPUT));
-	    if(fs.exists(posHadoopOutputPath)){
-	    	fs.delete(posHadoopOutputPath);
-	    }
-	     
-	     FileInputFormat.setInputPaths(jobConf,posHadoopInputPath);
-	     FileOutputFormat.setOutputPath(jobConf, posHadoopOutputPath);
-	
-	     JobClient.runJob(jobConf);
-	
+		try{
+			
+			JobConf jobConf = new JobConf(JobRunner.class);
+		     jobConf.setJobName(HadoopConstants.POS_HADOOP_JOB_NAME);
+		     logger.info("the filter is "+gson.toJson(saleFactFilter));
+		     jobConf.set(HadoopPropertiesKeys.FS_DEFAULT_FS, PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.DFS_URL, HadoopConstants.DFS_URL));
+		     if(saleFactFilter!=null){
+		    	 jobConf.set(HadoopPropertiesKeys.SALE_FACT_FILTER,gson.toJson(saleFactFilter));
+		     }
+		     jobConf.setEnum(HadoopPropertiesKeys.AGGREGATION_LEVEL, aggregationLevel);
+		     jobConf.setOutputKeyClass(Text.class);
+		     jobConf.setOutputValueClass(Text.class);
+		
+		     jobConf.setMapperClass(Map.class);
+		     jobConf.setCombinerClass(Reduce.class);
+		     jobConf.setReducerClass(Reduce.class);
+		
+		     jobConf.setInputFormat(TextInputFormat.class);
+		     jobConf.setOutputFormat(TextOutputFormat.class);
+		
+		     FileSystem fs = FileSystem.get(jobConf);
+		     
+		     String posHadoopInput = PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.POS_HADOOP_INPUT, HadoopConstants.POS_HADOOP_INPUT);
+		     Path posHadoopInputPath=  new Path(posHadoopInput+"/"+inputPath);
+		     logger.info("the inputpath is "+posHadoopInputPath);
+		     
+		     
+		    Path posHadoopOutputPath =  new Path(PropertiesProvider.getInstance().getProperty(HadoopPropertiesKeys.POS_HADOOP_OUTPUT, HadoopConstants.POS_HADOOP_OUTPUT));
+		    if(fs.exists(posHadoopOutputPath)){
+		    	fs.delete(posHadoopOutputPath);
+		    }
+		     
+		     FileInputFormat.setInputPaths(jobConf,posHadoopInputPath);
+		     FileOutputFormat.setOutputPath(jobConf, posHadoopOutputPath);
+		     logger.info("running job");
+		     JobClient.runJob(jobConf);
+		     logger.info("running job finished");
+		}catch(Exception e){
+			logger.error("an error ocurred while runnging the job",e);
+		}	
 	     logger.info("finished job");
 	}
 	
